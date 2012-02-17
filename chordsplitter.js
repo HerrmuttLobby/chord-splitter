@@ -109,6 +109,11 @@ function note(note, vel)
   splitter.newNote([note, val]);
 }
 
+function list(info, note, vel)
+{
+  splitter.newNote([note, val]);
+}
+
 function reset()
 {
   splitter.reset();
