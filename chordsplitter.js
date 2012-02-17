@@ -1,4 +1,4 @@
-/* Herrmutt Lobby • Chord Splitter */
+/* Herrmutt Lobby • Chord Splitter JS 0.1 */
 /* (c) Herrmutt Lobby 2012 • herrmuttlobby.com */
 /* This code is distributed under a Creative Commons : Attribution, Share Alike, No-commercial Licence */
 /* INPUT : list message starting with note then a note number and velocity  ( note noteNbr velocity ) or "reset" message to reset the chord */
