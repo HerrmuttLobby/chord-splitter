@@ -1,7 +1,7 @@
-/* Herrmutt Lobby • Chord Splitter JS 0.1 */
+/* Herrmutt Lobby • Chord Splitter JS 0.3 */
 /* (c) Herrmutt Lobby 2012 • herrmuttlobby.com */
 /* This code is distributed under a Creative Commons : Attribution, Share Alike, No-commercial Licence */
-/* INPUT : list message starting with note then a note number and velocity  ( note noteNbr velocity ) or "reset" message to reset the chord */
+/* INPUT : list message starting with note then a note number and velocity ( note noteNbr velocity ) or "reset" message to reset the chord */
 /* OUTPUT : quick series of ordered note tuples ( [index, noteNbr, velocity, nbrOfNoteInTheChord] ) */
 /* MADE TO BE USED WITHIN the JS object of MAX4LIVE or MAX/MSP or in PureData with the jj object of the PDJ external (http://www.le-son666.com/software/pdj/) */
 
@@ -17,7 +17,7 @@ quicksort = function(input){ /* quick sort function */
   {
     return input;
   }else
-  {  
+  {
     var pivot = input.splice(0, 1);
     var less = [];
     var greater = [];
@@ -47,6 +47,7 @@ splitter.chord = [];
 
 splitter.newNote = function(note) /* receive a new note info */
 {
+  post("newnote " + note); 
   if(note[1] === 0)
   {
     this.delNote(note);
@@ -59,36 +60,38 @@ splitter.newNote = function(note) /* receive a new note info */
 splitter.addNote = function(note){ /* add a note to the chord */
   this.chord.push(note);
   this.chord = quicksort(this.chord);
-  
-  this.output();
+
+  this.output42();
 }
 
 splitter.delNote = function(note){
   for (i = 0; i < this.chord.length; i++)
   {
-    if(chord[i][0] === note[0])
+    if(this.chord[i][0] === note[0])
     {
+      outlet(0, [i+1, this.chord[i][0], 0, this.chord.length-1]);
       this.chord.splice(i, 1);
     }
   }
-  
-  this.output();
+ 
+  this.output42();
 }
 
-splitter.reset()
+splitter.reset = function()
 {
   this.chord = [];
 }
 
-splitter.output = function(chord){
+splitter.output42 = function(){
   var outChord = [];
   
   for (i = 0; i < this.chord.length; i++)
   {
-    var out = [i+1, this.chord[i][0], this.chord[i][1], chord.length] 
+    var out = [i+1, this.chord[i][0], this.chord[i][1], this.chord.length];
     
     if(splitter.groupSend == false){ /* SENDING TUPLE ONE AT A TIME */
       outlet(0, out);
+//      outlet(1, this.chord.length);
     }
     
     outChord.push(out);
@@ -96,20 +99,21 @@ splitter.output = function(chord){
   
   if(splitter.groupSend == true){ /* SENDING THE WHOLE CHORD AS A BIG TUPLE CONTAINING TUPLES */
     outlet(0, outChord);
+ //   outlet(1, this.chord.length);
   }
 }
 
 /* MAIN */
 
 inlets = 1; // number of inlets
-outlets = 1; // number of outlets
+outlets = 2; // number of outlets
 
-function note(note, vel)
+function note(note, val)
 {
   splitter.newNote([note, val]);
 }
 
-function list(info, note, vel)
+function list(info, note, val)
 {
   splitter.newNote([note, val]);
 }
@@ -123,7 +127,7 @@ function reset()
 
 if(splitter.debug == true)
 {
-  setInterval(function(){     
+  setInterval(function(){
       splitter.newNote([Math.round(Math.random()*127),Math.round(Math.random()*127)]);
   }, 3000 );
 }
