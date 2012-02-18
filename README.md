@@ -11,6 +11,9 @@ This version is not complete and lack a wrapper in m4l and GUI.
 
 Changelog :
 -----------
+0.2.1 : 
+* small bugfix 
+
 0.2 : 
 * Add support for list message
 

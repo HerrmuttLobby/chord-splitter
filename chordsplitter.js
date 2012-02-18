@@ -109,7 +109,7 @@ function note(note, vel)
   splitter.newNote([note, val]);
 }
 
-function list(info, note, vel)
+function list(info, note, val)
 {
   splitter.newNote([note, val]);
 }
