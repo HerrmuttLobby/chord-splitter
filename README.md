@@ -1,4 +1,4 @@
-HERMMUTT LOBBY's Chord Splitter JS 0.1
+HERMMUTT LOBBY's Chord Splitter JS 0.4
 ======================================
 
 Description :
