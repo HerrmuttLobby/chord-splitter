@@ -1,4 +1,4 @@
-/* Herrmutt Lobby • Chord Splitter JS 0.3 */
+/* Herrmutt Lobby • Chord Splitter JS 0.4 */
 /* (c) Herrmutt Lobby 2012 • herrmuttlobby.com */
 /* This code is distributed under a Creative Commons : Attribution, Share Alike, No-commercial Licence */
 /* INPUT : list message starting with note then a note number and velocity ( note noteNbr velocity ) or "reset" message to reset the chord */
@@ -44,10 +44,16 @@ var splitter = new Object;
 splitter.groupSend = groupSend;
 splitter.debug = debug;
 splitter.chord = [];
+splitter.addStatus = false;
+splitter.outChord = [];
 
 splitter.newNote = function(note) /* receive a new note info */
 {
-  post("newnote " + note); 
+  if(splitter.debug == true)
+  {
+    post("newnote " + note); 
+  }
+
   if(note[1] === 0)
   {
     this.delNote(note);
@@ -58,6 +64,7 @@ splitter.newNote = function(note) /* receive a new note info */
 }
 
 splitter.addNote = function(note){ /* add a note to the chord */
+  this.addStatus = true;
   this.chord.push(note);
   this.chord = quicksort(this.chord);
 
@@ -65,11 +72,13 @@ splitter.addNote = function(note){ /* add a note to the chord */
 }
 
 splitter.delNote = function(note){
+  this.addStatus = false;
+  
   for (i = 0; i < this.chord.length; i++)
   {
     if(this.chord[i][0] === note[0])
     {
-      outlet(0, [i+1, this.chord[i][0], 0, this.chord.length-1]);
+      outlet(0, [this.chord[i][3], this.chord[i][0], 0, this.chord.length-1]);
       this.chord.splice(i, 1);
     }
   }
@@ -83,18 +92,29 @@ splitter.reset = function()
 }
 
 splitter.output42 = function(){
-  var outChord = [];
+  this.outChord = [];
   
-  for (i = 0; i < this.chord.length; i++)
+  for (i = 0; i < this.chord.length; i++){
+        if(this.chord[i][3] != i+1)
+        {
+            outlet(0, [this.chord[i][3], this.chord[i][0], 0, this.chord.length-1]);
+            this.chord[i][3] = i+1;
+            outlet(0, [this.chord[i][3], this.chord[i][0], this.chord[i][1], this.chord.length]);
+        }
+  }
+  
+  if(this.addStatus === true)
   {
-    var out = [i+1, this.chord[i][0], this.chord[i][1], this.chord.length];
-    
-    if(splitter.groupSend == false){ /* SENDING TUPLE ONE AT A TIME */
-      outlet(0, out);
-//      outlet(1, this.chord.length);
+    for (i = 0; i < this.chord.length; i++)
+    {
+        this.outLogic(i)
     }
-    
-    outChord.push(out);
+  }else
+  {
+    for (i = this.chord.length-1 ; i >= 0 ; i--)
+    {
+        this.outLogic(i)
+    }
   }
   
   if(splitter.groupSend == true){ /* SENDING THE WHOLE CHORD AS A BIG TUPLE CONTAINING TUPLES */
@@ -103,31 +123,45 @@ splitter.output42 = function(){
   }
 }
 
+splitter.outLogic = function(i)
+{
+    var out = [i+1, this.chord[i][0], this.chord[i][1], this.chord.length];
+    
+    if( this.debug === true )
+    {
+        k = i +1;
+        post('i = ' + k + ' :: ' + this.chord[i]);
+    }
+    
+    if(splitter.groupSend == false){ /* SENDING TUPLE ONE AT A TIME */
+        
+        if(this.chord[i][2] == false){
+            this.chord[i][2] = true;
+            this.chord[i].push(i+1);
+            outlet(0, out);
+        }
+//      outlet(1, this.chord.length);
+    }
+    
+    this.outChord.push(out);
+}
+
 /* MAIN */
 
 inlets = 1; // number of inlets
 outlets = 2; // number of outlets
 
-function note(note, val)
+function note(note, vel)
 {
-  splitter.newNote([note, val]);
+  splitter.newNote([note, vel, false]);
 }
 
-function list(info, note, val)
+function list(info, note, vel)
 {
-  splitter.newNote([note, val]);
+  splitter.newNote([note, vel, false]);
 }
 
 function reset()
 {
   splitter.reset();
-}
-
-/* DEBUG */
-
-if(splitter.debug == true)
-{
-  setInterval(function(){
-      splitter.newNote([Math.round(Math.random()*127),Math.round(Math.random()*127)]);
-  }, 3000 );
 }
