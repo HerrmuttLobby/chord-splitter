@@ -1,8 +1,6 @@
-/* Herrmutt Lobby • Chord Splitter JS 0.5 */
+/* Herrmutt Lobby • Chord Splitter JS 0.6 */
 /* (c) Herrmutt Lobby 2012 • herrmuttlobby.com */
 /* This software is distributed under a  */
-/* INPUT : list message starting with note then a note number and velocity ( note noteNbr velocity ) or "reset" message to reset the chord */
-/* OUTPUT : quick series of ordered note tuples ( [index, noteNbr, velocity, nbrOfNoteInTheChord] ) */
 /* MADE TO BE USED WITHIN the JS object of MAX4LIVE or MAX/MSP or in PureData with the jj object of the PDJ external (http://www.le-son666.com/software/pdj/) */
 
 /* CONFIG (should be done with message through an inlet */
@@ -110,14 +108,20 @@ splitter.output42 = function(){
   
   for (i = 0; i < this.chord.length; i++){
     
-    if(this.chord[i][3] != i+1) // if the note channel has been shifted from previous position
+    if(this.chord[i][3] != i+1 && this.chord[i][3]) // if the note channel has been shifted from previous position
     {
       outlet(0, [this.chord[i][3], this.chord[i][0], 0, this.chord.length-1]); // send note off
-      this.chord[i][3] = i+1; // change the channel number
+      this.chord[i][2] = false;
     }
     
+    this.chord[i][3] = i+1; // change the channel number
+    
     if(splitter.groupSend == false){ // send note on
-      outlet(0, [this.chord[i][3], this.chord[i][0], this.chord[i][1], this.chord.length]);
+      if(this.chord[i][2] == false)
+      {
+          outlet(0, [this.chord[i][3], this.chord[i][0], this.chord[i][1], this.chord.length]);
+          this.chord[i][2] = true;
+      }
     }
     else{ //populate the big tuple
       this.outChord.push([this.chord[i][3], this.chord[i][0], this.chord[i][1], this.chord.length]);
@@ -142,7 +146,7 @@ function note(note, vel)
 
 function list(info, note, val)
 {
-  splitter.newNote([note, vel, false]);
+  splitter.newNote([note, vel, false]); // 0=note number, 1=velocity, 2=has been played, 3=previous index
 }
 
 function reset()
