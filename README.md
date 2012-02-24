@@ -1,13 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-HERMMUTT LOBBY's Chord Splitter JS 0.4
-=======
 HERMMUTT LOBBY's Chord Splitter JS 0.6
->>>>>>> dev
-=======
-HERMMUTT LOBBY's Chord Splitter JS 0.6
->>>>>>> dev
-======================================
 
 Description :
 -------------
@@ -27,24 +18,14 @@ Todo :
 
 Changelog :
 -----------
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dev
 0.6 :
-* the note on is sent only once for each note until it changes it's place in the chord
+* the note on is sent only once for each note until its index changes
 
 0.5 :
 * adding the Max4Live wrapper (sender and receiver)
 * extensively comment the whole js code
 * various bugfix
 
-<<<<<<< HEAD
->>>>>>> dev
-=======
->>>>>>> dev
 0.4 :
 * bugfix
 
