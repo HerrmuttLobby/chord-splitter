@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 HERMMUTT LOBBY's Chord Splitter JS 0.4
+=======
+HERMMUTT LOBBY's Chord Splitter JS 0.6
+>>>>>>> dev
 =======
 HERMMUTT LOBBY's Chord Splitter JS 0.6
 >>>>>>> dev
@@ -25,7 +29,10 @@ Changelog :
 -----------
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dev
 0.6 :
 * the note on is sent only once for each note until it changes it's place in the chord
 
@@ -34,6 +41,9 @@ Changelog :
 * extensively comment the whole js code
 * various bugfix
 
+<<<<<<< HEAD
+>>>>>>> dev
+=======
 >>>>>>> dev
 0.4 :
 * bugfix
