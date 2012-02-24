@@ -2,7 +2,7 @@ HERMMUTT LOBBY's Chord Splitter JS 0.6
 ======================================
 
 Description :
-------------
+-------------
 The Chord Splitter is a max4live tool created to split and sort a chord played on a keyboard into indexed note that can be used somewhere else in your track.
 
 Usage :
