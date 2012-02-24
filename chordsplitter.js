@@ -1,8 +1,6 @@
-/* Herrmutt Lobby • Chord Splitter JS 0.4 */
+/* Herrmutt Lobby • Chord Splitter JS 0.6 */
 /* (c) Herrmutt Lobby 2012 • herrmuttlobby.com */
-/* This code is distributed under a Creative Commons : Attribution, Share Alike, No-commercial Licence */
-/* INPUT : list message starting with note then a note number and velocity ( note noteNbr velocity ) or "reset" message to reset the chord */
-/* OUTPUT : quick series of ordered note tuples ( [index, noteNbr, velocity, nbrOfNoteInTheChord] ) */
+/* This software is distributed under a  */
 /* MADE TO BE USED WITHIN the JS object of MAX4LIVE or MAX/MSP or in PureData with the jj object of the PDJ external (http://www.le-son666.com/software/pdj/) */
 
 /* CONFIG (should be done with message through an inlet */
@@ -47,7 +45,9 @@ splitter.chord = [];
 splitter.addStatus = false;
 splitter.outChord = [];
 
-splitter.newNote = function(note) /* receive a new note info */
+//*NOTE IN*//
+//* When a note is received we check if the note is a note on or a note off and route them accordingly. *//
+splitter.newNote = function(note)
 {
   if(splitter.debug == true)
   {
@@ -63,6 +63,8 @@ splitter.newNote = function(note) /* receive a new note info */
   }
 }
 
+//*NOTE ON*//
+//* When a note on (vel not equal to 0) is received, the note is added to the buffer, then the buffer is sorted and sent to output *//
 splitter.addNote = function(note){ /* add a note to the chord */
   this.addStatus = true;
   this.chord.push(note);
@@ -71,7 +73,9 @@ splitter.addNote = function(note){ /* add a note to the chord */
   this.output42();
 }
 
-splitter.delNote = function(note){
+//*NOTE OFF*//
+//* When a note with a velocity of 0 (note off) is received, the corresponding note on is removed from the buffer and the note off is send with the channel number of the corresponding note on, then the buffer is sent to output *//
+splitter.delNote = function(note){ 
   this.addStatus = false;
   
   for (i = 0; i < this.chord.length; i++)
@@ -86,64 +90,48 @@ splitter.delNote = function(note){
   this.output42();
 }
 
-splitter.reset = function()
+//*RESET*//
+//* On a reset message a note off is sent to the output and the buffer is cleared. *//
+splitter.reset = function() 
 {
+  for (i = 0; i< this.chord.length; i++)
+  {
+    outlet(0, [this.chord[i][3], this.chord[i][0], 0, this.chord.length-1]);
+  }
   this.chord = [];
 }
 
+//*OUTPUT*//
+//* When we need to send the whole buffer (after a note on or off) we trig this output function *//
 splitter.output42 = function(){
-  this.outChord = [];
+  this.outChord = []; //init the big tuple wich will be sent if we asked for
   
   for (i = 0; i < this.chord.length; i++){
-        if(this.chord[i][3] != i+1)
-        {
-            outlet(0, [this.chord[i][3], this.chord[i][0], 0, this.chord.length-1]);
-            this.chord[i][3] = i+1;
-            outlet(0, [this.chord[i][3], this.chord[i][0], this.chord[i][1], this.chord.length]);
-        }
+    
+    if(this.chord[i][3] != i+1 && this.chord[i][3]) // if the note channel has been shifted from previous position
+    {
+      outlet(0, [this.chord[i][3], this.chord[i][0], 0, this.chord.length-1]); // send note off
+      this.chord[i][2] = false;
+    }
+    
+    this.chord[i][3] = i+1; // change the channel number
+    
+    if(splitter.groupSend == false){ // send note on
+      if(this.chord[i][2] == false)
+      {
+          outlet(0, [this.chord[i][3], this.chord[i][0], this.chord[i][1], this.chord.length]);
+          this.chord[i][2] = true;
+      }
+    }
+    else{ //populate the big tuple
+      this.outChord.push([this.chord[i][3], this.chord[i][0], this.chord[i][1], this.chord.length]);
+    }
   }
   
-  if(this.addStatus === true)
-  {
-    for (i = 0; i < this.chord.length; i++)
-    {
-        this.outLogic(i)
-    }
-  }else
-  {
-    for (i = this.chord.length-1 ; i >= 0 ; i--)
-    {
-        this.outLogic(i)
-    }
-  }
-  
-  if(splitter.groupSend == true){ /* SENDING THE WHOLE CHORD AS A BIG TUPLE CONTAINING TUPLES */
+  if(splitter.groupSend == true){ /* Sending the big tuple if asked for */
     outlet(0, outChord);
- //   outlet(1, this.chord.length);
+    outlet(1, this.chord.length);
   }
-}
-
-splitter.outLogic = function(i)
-{
-    var out = [i+1, this.chord[i][0], this.chord[i][1], this.chord.length];
-    
-    if( this.debug === true )
-    {
-        k = i +1;
-        post('i = ' + k + ' :: ' + this.chord[i]);
-    }
-    
-    if(splitter.groupSend == false){ /* SENDING TUPLE ONE AT A TIME */
-        
-        if(this.chord[i][2] == false){
-            this.chord[i][2] = true;
-            this.chord[i].push(i+1);
-            outlet(0, out);
-        }
-//      outlet(1, this.chord.length);
-    }
-    
-    this.outChord.push(out);
 }
 
 /* MAIN */
@@ -156,9 +144,9 @@ function note(note, vel)
   splitter.newNote([note, vel, false]);
 }
 
-function list(info, note, vel)
+function list(info, note, val)
 {
-  splitter.newNote([note, vel, false]);
+  splitter.newNote([note, vel, false]); // 0=note number, 1=velocity, 2=has been played, 3=previous index
 }
 
 function reset()
