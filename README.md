@@ -25,12 +25,15 @@ Listen to how the chords is rearenged between the receivers.
 
 Todo :
 ------
+
 * use a better sorting algorithm (at least a better median choice than the first of the tuple to sort)
 * add possibility to sort backward 
 * add messages to toggle the sorting style and the output method
 * update the usage section
 * update the description
 * add a button to choose a send & receive channel
+* add sustain pedal
+* add other ordering rules
 
 Changelog :
 -----------
