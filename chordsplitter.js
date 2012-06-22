@@ -1,67 +1,51 @@
-/* Herrmutt Lobby • Chord Splitter JS 0.6 */
+/* Herrmutt Lobby • Chord Splitter JS 0.62 */
 /* (c) Herrmutt Lobby 2012 • herrmuttlobby.com */
-/* This software is distributed under a  */
+/* This code is distributed under a Creative Commons : Attribution, Share Alike, No-commercial Licence */
+/* INPUT : list message starting with note then a note number and velocity ( note noteNbr velocity ) or "reset" message to reset the chord */
+/* OUTPUT : quick series of ordered note tuples ( [index, noteNbr, velocity, nbrOfNoteInTheChord] ) */
 /* MADE TO BE USED WITHIN the JS object of MAX4LIVE or MAX/MSP or in PureData with the jj object of the PDJ external (http://www.le-son666.com/software/pdj/) */
 
 /* CONFIG (should be done with message through an inlet */
 
 groupSend = false; // choose between pushing note once by once through the outlet, or all in a big tuple
-debug = false; // put in debug mode
+DEBUG     = false; // put in debug mode
 
 /* CODE */
 
-quicksort = function(input){ /* quick sort function */
-  if(input.length <= 1)
+/* quick sort function */
+quicksort = function( input ){
+  if(input.length <= 1) return input;
+
+  var pivot   = input.splice(0, 1);
+  var less    = [];
+  var greater = [];
+  var x;
+
+  for(i = 0; i < input.length; i++)
   {
-    return input;
-  }else
-  {
-    var pivot = input.splice(0, 1);
-    var less = [];
-    var greater = [];
-    var output = [];
-    
-    for (i = 0; i < input.length; i++)
-    {
-      x = input[i];
-      
-      if (x[0] <= pivot[0][0])
-      {
-        less.push(x);
-      }else{
-        greater.push(x);
-      }
-    }
-    
-    return output.concat(quicksort(less), pivot, quicksort(greater));
+    x = input[i];
+    x <= pivot[0][0] ? less.push(x) : greater.push(x);
   }
+  
+  return [].concat(quicksort(less), pivot, quicksort(greater));
 }
 
-var splitter = new Object;
-
-splitter.groupSend = groupSend;
-splitter.debug = debug;
-splitter.chord = [];
-splitter.addStatus = false;
-splitter.outChord = [];
+var splitter = {
+   groupSend : groupSend
+  ,chord     : []
+  ,addStatus : false
+  ,outChord  : []
+}
 
 //*NOTE IN*//
 //* When a note is received we check if the note is a note on or a note off and route them accordingly. *//
-splitter.newNote = function(note)
-{
-  if(splitter.debug == true)
-  {
-    post("newnote " + note); 
-  }
+splitter.newNote = function(note){
+  if(DEBUG) post("newnote " + note); 
 
-  if(note[1] === 0)
-  {
-    this.delNote(note);
-  }else
-  {
-    this.addNote(note);
-  }
+  // if note velocity different of 0 add note otherwise remove
+  note[1] ? this.addNote(note) : this.delNote(note);
 }
+
 
 //*NOTE ON*//
 //* When a note on (vel not equal to 0) is received, the note is added to the buffer, then the buffer is sorted and sent to output *//
@@ -136,7 +120,7 @@ splitter.output42 = function(){
 
 /* MAIN */
 
-inlets = 1; // number of inlets
+inlets  = 1; // number of inlets
 outlets = 2; // number of outlets
 
 function note(note, vel)
@@ -144,9 +128,9 @@ function note(note, vel)
   splitter.newNote([note, vel, false]);
 }
 
-function list(info, note, val)
+function list(info, note, vel)
 {
-  splitter.newNote([note, vel, false]); // 0=note number, 1=velocity, 2=has been played, 3=previous index
+  splitter.newNote([note, vel, false]);
 }
 
 function reset()
