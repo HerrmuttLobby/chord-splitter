@@ -1,4 +1,4 @@
-/* Herrmutt Lobby • Chord Splitter JS 0.62 */
+/* Herrmutt Lobby • Chord Splitter JS 0.7 */
 /* (c) Herrmutt Lobby 2012 • herrmuttlobby.com */
 /* This code is distributed under a Creative Commons : Attribution, Share Alike, No-commercial Licence */
 /* INPUT : list message starting with note then a note number and velocity ( note noteNbr velocity ) or "reset" message to reset the chord */
@@ -9,6 +9,7 @@
 
 groupSend = false; // choose between pushing note once by once through the outlet, or all in a big tuple
 DEBUG     = false; // put in debug mode
+
 
 /* CODE */
 
@@ -24,7 +25,15 @@ quicksort = function( input ){
   for(i = 0; i < input.length; i++)
   {
     x = input[i];
-    x <= pivot[0][0] ? less.push(x) : greater.push(x);
+    switch(splitter.sortAlgo)
+    {   
+      default:
+      case "sortUp":
+        x <= pivot[0][0] ? less.push(x) : greater.push(x);
+        break;
+      case "sortDown":
+        x >= pivot[0][0] ? less.push(x) : greater.push(x);
+    }
   }
   
   return [].concat(quicksort(less), pivot, quicksort(greater));
@@ -35,6 +44,7 @@ var splitter = {
   ,chord     : []
   ,addStatus : false
   ,outChord  : []
+  ,sortAlgo  : "sortUp" // choose an sort algorythm ( sortUp, sortDown, ...) 
 }
 
 //*NOTE IN*//
@@ -131,6 +141,11 @@ function note(note, vel)
 function list(info, note, vel)
 {
   splitter.newNote([note, vel, false]);
+}
+
+function algo(algorythm)
+{
+  splitter.sortAlgo = algorythm;
 }
 
 function reset()

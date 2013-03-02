@@ -1,15 +1,15 @@
-HERMMUTT LOBBY's Chord Splitter JS 0.6
+HERMMUTT LOBBY's Chord Splitter JS 0.7
 
 Description :
 -------------
 The Chord Splitter is a max4live tool created to split and sort a chord played on a keyboard into indexed note that can be used somewhere else in your track.
 
 
-
-
 Usage :
 -------
 Check out the demo and play some chords on your keyboard.
+
+To change the algorythm send a message in the first inlet with : "algo sortUp" or "algo sortDown"
 
 --
 
@@ -27,7 +27,6 @@ Todo :
 ------
 
 * use a better sorting algorithm (at least a better median choice than the first of the tuple to sort)
-* add possibility to sort backward 
 * add messages to toggle the sorting style and the output method
 * update the usage section
 * update the description
@@ -37,6 +36,10 @@ Todo :
 
 Changelog :
 -----------
+
+0.7 : 
+* choice for sort algorythm ( up or down for now )
+
 0.6 :
 * the note on is sent only once for each note until its index changes
 
