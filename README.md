@@ -7,14 +7,11 @@ The Chord Splitter is a max4live tool created to split and sort a chord played o
 
 Usage :
 -------
-Check out the demo and play some chords on your keyboard.
-
-To change the algorythm send a message in the first inlet with : "algo sortUp" or "algo sortDown"
-
---
 
 Use the sender on a midi listening track (midi comming either from midi clip or from external midi device).
+
 Put the receiver on any other midi track folowed by instruments, the receiver is intended to be used as a source of notes.
+
 Activate on each receiver a subset of index.
 
 Play some chords on the splitter track and change some notes without changing the whole chord.
